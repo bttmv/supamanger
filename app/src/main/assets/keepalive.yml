@@ -1,0 +1,23 @@
+name: Supabase Keep Alive
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping all projects
+        env:
+          PROJECTS: ${{ secrets.SUPABASE_PROJECTS }}
+        run: |
+          fail=0
+          while read -r p; do
+            name=$(echo "$p" | jq -r .name)
+            url=$(echo "$p" | jq -r .url)
+            key=$(echo "$p" | jq -r .key)
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$url/rest/v1/" -H "apikey: $key" -H "Authorization: Bearer $key")
+            echo "$name -> $code"
+            case "$code" in 2*) ;; *) fail=1 ;; esac
+          done < <(echo "$PROJECTS" | jq -c '.[]')
+          exit $fail
