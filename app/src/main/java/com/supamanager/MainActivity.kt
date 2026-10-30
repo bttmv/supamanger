@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -56,7 +57,7 @@ fun pretty(s: String) = runCatching { if (s.trim().startsWith("[")) JSONArray(s)
                 list.forEach { Store.log(c, it.name, runCatching { Api.keepAlive(it) }.getOrElse { e -> "فشل: ${e.message}" }) }; tick++ } }) { Text("إنعاش الكل الآن") }
         }
         key(tick) { LazyColumn(Modifier.padding(top = 8.dp)) { items(list) { pr ->
-            Card(Modifier.fillMaxWidth().padding(vertical = 4.dp), onClick = { sel = pr }) { Column(Modifier.padding(12.dp)) {
+            Card(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { sel = pr }) { Column(Modifier.padding(12.dp)) {
                 Text(pr.name, style = MaterialTheme.typography.titleMedium); Text(pr.url, style = MaterialTheme.typography.bodySmall)
                 Text("آخر إنعاش: " + Store.lastLog(c, pr.name), style = MaterialTheme.typography.bodySmall)
                 TextButton({ list = list - pr; Store.save(c, list) }) { Text("حذف") } } } } } }
